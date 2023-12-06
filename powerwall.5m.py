@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/Users/joshw/anaconda3/envs/py39/bin/python
 #
 # <xbar.title>Powerwall</xbar.title>
 # <xbar.version>v1.0</xbar.version>
