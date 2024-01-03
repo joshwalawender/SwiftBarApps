@@ -61,9 +61,14 @@ HarrietDiskStation_age = (datetime.now()-last).total_seconds()/60/60/24
 HarrietDiskStation_ok = HarrietDiskStation_age <= 1
 
 ok = weather_ok and powerwall_ok and ScienceData_ok and Ohina2External_ok and HarrietDiskStation_ok
+ok_count = weather_ok + powerwall_ok + ScienceData_ok + Ohina2External_ok + HarrietDiskStation_ok
 ok_string = {True: 'OK', False: 'ALERT'}
+total_statuses = 5
 
-print(f"Ohina: {ok_string[ok]}")
+result_string = f"Ohina: {ok_string[ok]}"
+if not ok:
+    result_string += f' ({total_statuses-ok_count}/{total_statuses})'
+print(result_string)
 print('---')
 print(f"{ok_string[weather_ok]}: Weather Entries ({recent_weather_count})")
 print(f"{ok_string[powerwall_ok]}: Powerwall Entries ({recent_powerwall_count})")
