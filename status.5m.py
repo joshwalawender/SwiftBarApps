@@ -39,26 +39,28 @@ cursor.fetchall()
 recent_powerwall_count = cursor.rowcount
 powerwall_ok = recent_powerwall_count > 0
 
+backup_age_threshold = 1.5 #days
+
 # Backup ScienceData
 with open('/Volumes/Ohina2External/ScienceData/.last_backup_end', 'r') as f:
     lines = f.readlines()
     last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
 ScienceData_age = (datetime.now()-last).total_seconds()/60/60/24
-ScienceData_ok = ScienceData_age <= 1
+ScienceData_ok = ScienceData_age <= backup_age_threshold
 
 # Backup Ohina2External
 with open('/Volumes/Ohina2External/.last_backup_end', 'r') as f:
     lines = f.readlines()
     last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
 Ohina2External_age = (datetime.now()-last).total_seconds()/60/60/24
-Ohina2External_ok = Ohina2External_age <= 1
+Ohina2External_ok = Ohina2External_age <= backup_age_threshold
 
 # Backup HarrietDiskStation
 with open('/Volumes/Ohina2External/Backup_HarrietDiskStation/.last_backup_end', 'r') as f:
     lines = f.readlines()
     last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
 HarrietDiskStation_age = (datetime.now()-last).total_seconds()/60/60/24
-HarrietDiskStation_ok = HarrietDiskStation_age <= 1
+HarrietDiskStation_ok = HarrietDiskStation_age <= backup_age_threshold
 
 ok = weather_ok and powerwall_ok and ScienceData_ok and Ohina2External_ok and HarrietDiskStation_ok
 ok_count = weather_ok + powerwall_ok + ScienceData_ok + Ohina2External_ok + HarrietDiskStation_ok
