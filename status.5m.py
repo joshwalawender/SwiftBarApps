@@ -32,41 +32,45 @@ recent_weather_count = cursor.rowcount
 weather_ok = recent_weather_count > 0
 
 # Powerwall
-powerwall_query = ("SELECT time FROM Powerwall "
+powerwall_query = ("SELECT time FROM PowerwallData "
                    "WHERE time BETWEEN %s AND %s")
 cursor.execute(powerwall_query, (start, end))
 cursor.fetchall()
 recent_powerwall_count = cursor.rowcount
 powerwall_ok = recent_powerwall_count > 0
 
-backup_age_threshold = 1.5 #days
-
-# Backup ScienceData
-with open('/Volumes/Ohina2External/ScienceData/.last_backup_end', 'r') as f:
-    lines = f.readlines()
-    last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
-ScienceData_age = (datetime.now()-last).total_seconds()/60/60/24
-ScienceData_ok = ScienceData_age <= backup_age_threshold
 
 # Backup Ohina2External
+backup_age_threshold = 2.0 #days
+with open('/Volumes/Ohina2External/.last_backup_begin', 'r') as f:
+    lines = f.readlines()
+lastbegin = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
 with open('/Volumes/Ohina2External/.last_backup_end', 'r') as f:
     lines = f.readlines()
-    last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
-Ohina2External_age = (datetime.now()-last).total_seconds()/60/60/24
-Ohina2External_ok = Ohina2External_age <= backup_age_threshold
+last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
+O2E_begin_age = (datetime.now()-lastbegin).total_seconds()/60/60/24
+O2E_age = (datetime.now()-last).total_seconds()/60/60/24
+O2E_ok = O2E_age <= backup_age_threshold
 
 # Backup HarrietDiskStation
+backup_age_threshold = 2.0 #days
+with open('/Volumes/Ohina2External/Backup_HarrietDiskStation/.last_backup_begin', 'r') as f:
+    lines = f.readlines()
+lastbegin = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
 with open('/Volumes/Ohina2External/Backup_HarrietDiskStation/.last_backup_end', 'r') as f:
     lines = f.readlines()
-    last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
-HarrietDiskStation_age = (datetime.now()-last).total_seconds()/60/60/24
-HarrietDiskStation_ok = HarrietDiskStation_age <= backup_age_threshold
+last = datetime.strptime(lines[-1][:16], '%Y%m%dat%H%M%S')
+HDS_begin_age = (datetime.now()-lastbegin).total_seconds()/60/60/24
+HDS_age = (datetime.now()-last).total_seconds()/60/60/24
+HDS_ok = HDS_age <= backup_age_threshold
 
-ok = weather_ok and powerwall_ok and ScienceData_ok and Ohina2External_ok and HarrietDiskStation_ok
-ok_count = weather_ok + powerwall_ok + ScienceData_ok + Ohina2External_ok + HarrietDiskStation_ok
+# Determine overall Ok Status
+ok = weather_ok and powerwall_ok and O2E_ok and HDS_ok
+ok_count = weather_ok + powerwall_ok + O2E_ok + HDS_ok
 ok_string = {True: 'OK', False: 'ALERT'}
-total_statuses = 5
+total_statuses = 4
 
+# Build output
 result_string = f"Ohina: {ok_string[ok]}"
 if not ok:
     result_string += f' ({total_statuses-ok_count}/{total_statuses})'
@@ -74,6 +78,5 @@ print(result_string)
 print('---')
 print(f"{ok_string[weather_ok]}: Weather Entries ({recent_weather_count})")
 print(f"{ok_string[powerwall_ok]}: Powerwall Entries ({recent_powerwall_count})")
-print(f"{ok_string[ScienceData_ok]}: Backup ScienceData ({ScienceData_age:.1f} days)")
-print(f"{ok_string[Ohina2External_ok]}: Backup Ohina2External ({Ohina2External_age:.1f} days)")
-print(f"{ok_string[HarrietDiskStation_ok]}: Backup HarrietDiskStation ({HarrietDiskStation_age:.1f} days)")
+print(f"{ok_string[O2E_ok]}: Ohina2External: age = {O2E_age:.1f} days (last attempt: {O2E_begin_age:.1f} days)")
+print(f"{ok_string[HDS_ok]}: HarrietDiskStation: age = {HDS_age:.1f} days (last attempt: {HDS_begin_age:.1f} days)")
