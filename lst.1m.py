@@ -42,12 +42,7 @@ moon_illum = 0.50*(1 - np.sin(sun.dec.radian)*np.sin(moon.dec.radian)\
 # print(f"MJD {now.mjd:.1f}, LST {lst_str}")
 print(f"LST {lst_str}")
 print('---')
-if moon_alt < 0:
-    print(f"A {moon_illum:.0%} Moon is Down")
-else:
-    print(f"A {moon_illum:.0%} Moon is Up")
-
-if sun_alt < 0:
-    print(f'Sun is Down')
-else:
-    print(f'Sun is Up (alt={sun_alt:.0f})')
+sunupdown = {True: 'Up', False: 'Down'}[sun_alt > 0]
+print(f"Sun is {sunupdown} (alt={sun_alt:.0f})")
+moonupdown = {True: 'Up', False: 'Down'}[moon_alt > 0]
+print(f"A {moon_illum:.0%} Moon is {moonupdown} (alt={moon_alt:.0f})")
