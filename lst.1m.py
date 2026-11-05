@@ -6,16 +6,18 @@
 # <xbar.author.github>joshwalawender</xbar.author.github>
 # <xbar.desc>Show the current Modified Julian Date and Local Sidereal Time</xbar.desc>
 #
+from datetime import datetime, UTC
 from astropy.time import Time
 from astropy import units as u
 from astropy import coordinates
 import numpy as np
-now = Time.now()
 loc = coordinates.EarthLocation(coordinates.Longitude(-155.71513333*u.deg),
                                 coordinates.Latitude(20.02868056*u.deg),
                                 677*u.meter
                                 )
-now.location = loc
+dtnow = datetime.now(tz=UTC)
+now = Time(val=dtnow, format="datetime", scale="utc", location=loc)
+
 altazframe = coordinates.AltAz(location=loc, obstime=now, pressure=0)
 
 lst = now.sidereal_time('mean')
@@ -23,7 +25,7 @@ lst_hour = int(np.floor(lst.hour))
 lst_min = (lst.hour - lst_hour)*60
 lst_str = f"{lst_hour:02d}:{lst_min:02.0f}"
 
-moon = coordinates.get_moon(now, loc)
+moon = coordinates.get_body("moon", now, loc)
 moon_alt = ((moon.transform_to(altazframe).alt).to(u.degree)).value
 
 sun = coordinates.get_sun(now)

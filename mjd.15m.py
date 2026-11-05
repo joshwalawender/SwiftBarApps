@@ -6,21 +6,23 @@
 # <xbar.author.github>joshwalawender</xbar.author.github>
 # <xbar.desc>Show the current Modified Julian Date</xbar.desc>
 #
+from datetime import datetime, UTC
 from astropy.time import Time
 from astroplan import moon_illumination, Observer
 from astropy import units as u
 from astropy import coordinates
-now = Time.now()
 loc = coordinates.EarthLocation(coordinates.Longitude(-155.71513333*u.deg),
                                 coordinates.Latitude(20.02868056*u.deg),
                                 677*u.meter
                                 )
+dtnow = datetime.now(tz=UTC)
+now = Time(val=dtnow, format="datetime", scale="utc", location=loc)
 observer = Observer(location=loc, name="Ohina")
 
 # lst = observer.local_sidereal_time(now)
 # lst_str = f"{lst.hms.h:.0f}:{lst.hms.m:02.0f}"
 
-moon = coordinates.get_moon(now, loc)
+moon = coordinates.get_body("moon", now, loc)
 moon_alt = observer.altaz(now, moon).alt
 
 sun = coordinates.get_sun(now)
